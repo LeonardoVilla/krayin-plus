@@ -52,6 +52,11 @@
             </div>
         </v-dark>
 
+        @php($currentUser = auth()->guard('user')->user())
+        @if ($currentUser->role && $currentUser->role->permission_type === 'all')
+            <v-impersonate-quick></v-impersonate-quick>
+        @endif
+
         <div class="md:hidden">
             <!-- Quick Creation Bar -->
             @include('admin::components.layouts.header.quick-creation')
@@ -209,6 +214,107 @@
                     }
 
                     return 0;
+                },
+            },
+        });
+    </script>
+
+    <script
+        type="text/x-template"
+        id="v-impersonate-quick-template"
+    >
+        <div class="flex">
+            <span
+                class="icon-eye cursor-pointer rounded-md p-1.5 text-2xl transition-all hover:bg-gray-100 dark:hover:bg-gray-950"
+                title="Simular Usuário"
+                @click="open"
+            ></span>
+        </div>
+
+        <x-admin::modal ref="impersonateModal">
+            <x-slot:header>
+                <p class="text-lg font-bold text-gray-800 dark:text-white">
+                    Simular Usuário
+                </p>
+            </x-slot>
+
+            <x-slot:content>
+                <div v-if="isLoading" class="py-4 text-center text-gray-500">
+                    Carregando...
+                </div>
+
+                <table v-else class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b text-left text-gray-600 dark:border-gray-800 dark:text-gray-300">
+                            <th class="py-2">Nome</th>
+                            <th class="py-2">Status</th>
+                            <th class="py-2 text-right">Ação</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr
+                            v-for="user in users"
+                            :key="user.id"
+                            class="border-b last:border-0 dark:border-gray-800"
+                        >
+                            <td class="py-2 text-gray-800 dark:text-white">@{{ user.name }}</td>
+
+                            <td class="py-2">
+                                <span :class="user.status == 1 ? 'label-active' : 'label-inactive'">
+                                    @{{ user.status == 1 ? 'Ativo' : 'Inativo' }}
+                                </span>
+                            </td>
+
+                            <td class="py-2 text-right">
+                                <a :href="`{{ url('admin/settings/users') }}/${user.id}/impersonate`">
+                                    <span
+                                        class="icon-eye cursor-pointer rounded-md p-1.5 text-2xl transition-all hover:bg-gray-200 dark:hover:bg-gray-800"
+                                        title="Simular"
+                                    ></span>
+                                </a>
+                            </td>
+                        </tr>
+
+                        <tr v-if="! users.length">
+                            <td colspan="3" class="py-4 text-center text-gray-500">
+                                Nenhum usuário encontrado.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </x-slot>
+        </x-admin::modal>
+    </script>
+
+    <script type="module">
+        app.component('v-impersonate-quick', {
+            template: '#v-impersonate-quick-template',
+
+            data() {
+                return {
+                    isLoading: false,
+
+                    users: [],
+                };
+            },
+
+            methods: {
+                open() {
+                    this.$refs.impersonateModal.toggle();
+
+                    this.isLoading = true;
+
+                    this.$axios
+                        .get("{{ route('admin.settings.users.impersonate.list') }}")
+                        .then((response) => {
+                            this.users = response.data.data;
+
+                            this.isLoading = false;
+                        })
+                        .catch(() => {
+                            this.isLoading = false;
+                        });
                 },
             },
         });

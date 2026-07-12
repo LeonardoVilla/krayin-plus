@@ -2,6 +2,7 @@
 
 namespace Webkul\Admin\Http\Controllers\Settings;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\User\Repositories\UserRepository;
@@ -18,6 +19,27 @@ use Webkul\User\Repositories\UserRepository;
 class ImpersonateController extends Controller
 {
     public function __construct(protected UserRepository $userRepository) {}
+
+    /**
+     * Lista enxuta de usuários (id, nome, status) para o modal "Simular
+     * Usuário" — não usa o DataGrid completo, só o essencial pra escolher
+     * quem simular. Só acessível pra quem já tem acesso total.
+     */
+    public function list(): JsonResponse
+    {
+        $actingUser = auth()->guard('user')->user();
+
+        if (! $actingUser->role || $actingUser->role->permission_type !== 'all') {
+            abort(401, 'This action is unauthorized');
+        }
+
+        $users = $this->userRepository
+            ->all(['id', 'name', 'status'])
+            ->reject(fn ($user) => $user->id == $actingUser->id)
+            ->values();
+
+        return new JsonResponse(['data' => $users]);
+    }
 
     /**
      * Começa a simular o usuário informado.

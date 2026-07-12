@@ -180,6 +180,8 @@ Route::prefix('settings')->group(function () {
      * Impersonate (simular usuário) Routes.
      */
     Route::controller(ImpersonateController::class)->prefix('users')->group(function () {
+        Route::get('impersonate/list', 'list')->name('admin.settings.users.impersonate.list');
+
         Route::get('{id}/impersonate', 'start')->name('admin.settings.users.impersonate.start');
 
         Route::get('impersonate/stop', 'stop')->name('admin.settings.users.impersonate.stop');
