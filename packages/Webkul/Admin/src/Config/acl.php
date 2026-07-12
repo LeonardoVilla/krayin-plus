@@ -627,5 +627,10 @@ return [
         'name' => 'admin::app.acl.delete',
         'route' => ['admin.projects.delete', 'admin.projects.mass_delete', 'admin.projects.tasks.delete'],
         'sort' => 3,
+    ], [
+        'key' => 'audit_log',
+        'name' => 'admin::app.acl.audit-log',
+        'route' => 'admin.audit_log.index',
+        'sort' => 12,
     ],
 ];

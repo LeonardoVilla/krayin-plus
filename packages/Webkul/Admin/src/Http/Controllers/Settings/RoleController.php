@@ -113,6 +113,24 @@ class RoleController extends Controller
             'permissions' => request()->has('permissions') ? request('permissions') : [],
         ]);
 
+        /**
+         * Ninguém pode tirar o próprio acesso total editando a própria
+         * função: se o usuário logado está editando a função que ele mesmo
+         * usa e ela é 'all' (acesso total), essa função continua 'all'
+         * independente do que foi enviado no formulário.
+         */
+        $authUser = auth()->guard('user')->user();
+
+        if (
+            $authUser
+            && $authUser->role_id == $id
+            && $authUser->role
+            && $authUser->role->permission_type === 'all'
+        ) {
+            $data['permission_type'] = 'all';
+            unset($data['permissions']);
+        }
+
         $role = $this->roleRepository->update($data, $id);
 
         Event::dispatch('settings.role.update.after', $role);

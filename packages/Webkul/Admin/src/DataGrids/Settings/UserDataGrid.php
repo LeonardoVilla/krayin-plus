@@ -113,6 +113,20 @@ class UserDataGrid extends DataGrid
                 'url' => fn ($row) => route('admin.settings.users.delete', $row->id),
             ]);
         }
+
+        $authUser = auth()->guard('user')->user();
+
+        if ($authUser && $authUser->role && $authUser->role->permission_type === 'all') {
+            $this->addAction([
+                'index' => 'impersonate',
+                'icon' => 'icon-view',
+                'title' => 'Simular',
+                'method' => 'GET',
+                'url' => fn ($row) => $row->id == $authUser->id
+                    ? '#'
+                    : route('admin.settings.users.impersonate.start', $row->id),
+            ]);
+        }
     }
 
     /**

@@ -129,8 +129,18 @@ class UserController extends Controller
 
         $authUser = auth()->guard('user')->user();
 
+        /**
+         * Ninguém pode tirar o próprio acesso: se o usuário logado está
+         * editando a própria conta e seu papel atual é 'all' (acesso
+         * total, ex.: Super Admin/TI), ele continua ativo e no mesmo papel,
+         * não importa o que foi enviado no formulário.
+         */
         if ($authUser->id == $id) {
             $data['status'] = true;
+
+            if ($authUser->role && $authUser->role->permission_type === 'all') {
+                $data['role_id'] = $authUser->role_id;
+            }
         }
 
         Event::dispatch('settings.user.update.before', $id);
@@ -167,6 +177,12 @@ class UserController extends Controller
         if ($this->userRepository->count() == 1) {
             return new JsonResponse([
                 'message' => trans('admin::app.settings.users.index.last-delete-error'),
+            ], 400);
+        }
+
+        if (auth()->guard('user')->user()->id == $id) {
+            return new JsonResponse([
+                'message' => 'Você não pode excluir a própria conta.',
             ], 400);
         }
 

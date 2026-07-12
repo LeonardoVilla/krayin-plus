@@ -4,6 +4,7 @@ return [
     'acl' => [
         'support-tickets' => 'Chamados',
         'projects' => 'Projetos',
+        'audit-log' => 'Auditoria',
         'leads' => 'Oportunidades',
         'lead' => 'Oportunidade',
         'quotes' => 'Cotações',

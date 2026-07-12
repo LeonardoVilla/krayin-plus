@@ -5,6 +5,7 @@ use Webkul\Admin\Http\Controllers\Settings\AttributeController;
 use Webkul\Admin\Http\Controllers\Settings\DataTransfer\ImportController;
 use Webkul\Admin\Http\Controllers\Settings\EmailTemplateController;
 use Webkul\Admin\Http\Controllers\Settings\GroupController;
+use Webkul\Admin\Http\Controllers\Settings\ImpersonateController;
 use Webkul\Admin\Http\Controllers\Settings\LocationController;
 use Webkul\Admin\Http\Controllers\Settings\Marketing\CampaignsController;
 use Webkul\Admin\Http\Controllers\Settings\Marketing\EventController;
@@ -173,6 +174,15 @@ Route::prefix('settings')->group(function () {
         Route::post('mass-update', 'massUpdate')->name('admin.settings.users.mass_update');
 
         Route::post('mass-destroy', 'massDestroy')->name('admin.settings.users.mass_delete');
+    });
+
+    /**
+     * Impersonate (simular usuário) Routes.
+     */
+    Route::controller(ImpersonateController::class)->prefix('users')->group(function () {
+        Route::get('{id}/impersonate', 'start')->name('admin.settings.users.impersonate.start');
+
+        Route::get('impersonate/stop', 'stop')->name('admin.settings.users.impersonate.stop');
     });
 
     /**

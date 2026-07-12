@@ -43,7 +43,7 @@ class AuditLogController extends Controller
 
     private function render($rows, $modelList, $actionLabels, $actionColors, $total, $page, $perPage, Request $request): string
     {
-        $h = fn ($s) => htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');
+        $h = fn ($s) => htmlspecialchars(is_scalar($s) || $s === null ? (string) $s : json_encode($s), ENT_QUOTES, 'UTF-8');
         $module = $h($request->get('model', ''));
         $action = $h($request->get('audit_action', ''));
         $userName = $h($request->get('user', ''));
