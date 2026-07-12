@@ -1,6 +1,6 @@
 <div
     ref="sidebar"
-    class="duration-80 fixed top-[60px] z-[10002] h-full w-[200px] border-gray-300 bg-white pt-4 transition-all group-[.sidebar-collapsed]/container:w-[70px] dark:border-gray-800 dark:bg-gray-900 max-lg:hidden ltr:border-r rtl:border-l"
+    class="duration-80 fixed top-[60px] z-[10002] h-full w-[200px] pt-4 transition-all group-[.sidebar-collapsed]/container:w-[70px] max-lg:hidden ltr:border-r rtl:border-l {{ session()->has('impersonator_id') ? 'bg-yellow-400 border-yellow-600 dark:bg-yellow-500 dark:border-yellow-700' : 'bg-white border-gray-300 dark:border-gray-800 dark:bg-gray-900' }}"
     @mouseover="handleMouseOver"
     @mouseleave="handleMouseLeave"
 >

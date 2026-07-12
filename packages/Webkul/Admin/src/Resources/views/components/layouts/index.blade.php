@@ -106,21 +106,6 @@
 
         {!! view_render_event('admin.layout.content.before') !!}
 
-        @if (session()->has('impersonator_id'))
-            <div class="flex items-center justify-center gap-2 bg-yellow-500 px-4 py-2 text-center text-sm font-semibold text-gray-900">
-                <span>
-                    Você está navegando como <strong>{{ auth()->guard('user')->user()->name }}</strong> (simulação iniciada por {{ session('impersonator_name') }}).
-                </span>
-
-                <a
-                    href="{{ route('admin.settings.users.impersonate.stop') }}"
-                    class="ml-2 rounded bg-gray-900 px-3 py-1 text-white hover:bg-gray-800"
-                >
-                    Voltar para o meu usuário
-                </a>
-            </div>
-        @endif
-
         <!-- Page Header Blade Component -->
         <x-admin::layouts.header />
 

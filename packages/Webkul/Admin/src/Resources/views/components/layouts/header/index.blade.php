@@ -1,4 +1,4 @@
-<header class="sticky top-0 z-[10001] flex items-center justify-between gap-1 border-b border-gray-300 bg-white px-4 py-2.5 transition-all dark:border-gray-800 dark:bg-gray-900">  
+<header class="sticky top-0 z-[10001] flex items-center justify-between gap-1 border-b px-4 py-2.5 transition-all {{ session()->has('impersonator_id') ? 'bg-yellow-400 border-yellow-600 dark:bg-yellow-500 dark:border-yellow-700' : 'bg-white border-gray-300 dark:border-gray-800 dark:bg-gray-900' }}">
     <!-- logo -->
     <div class="flex items-center gap-1.5">
         <!-- Sidebar Menu -->
@@ -56,7 +56,22 @@
             <!-- Quick Creation Bar -->
             @include('admin::components.layouts.header.quick-creation')
         </div>
-        
+
+        @if (session()->has('impersonator_id'))
+            <div class="flex items-center gap-2 rounded-md bg-gray-900 px-3 py-1.5 text-sm text-white">
+                <span class="whitespace-nowrap">
+                    Simulando: <strong>{{ auth()->guard('user')->user()->name }}</strong>
+                </span>
+
+                <a
+                    href="{{ route('admin.settings.users.impersonate.stop') }}"
+                    class="whitespace-nowrap rounded bg-yellow-400 px-2 py-0.5 font-semibold text-gray-900 hover:bg-yellow-300"
+                >
+                    Encerrar simulação
+                </a>
+            </div>
+        @endif
+
         <!-- Admin profile -->
         <x-admin::dropdown position="bottom-{{ in_array(app()->getLocale(), ['fa', 'ar']) ? 'left' : 'right' }}">
             <x-slot:toggle>
