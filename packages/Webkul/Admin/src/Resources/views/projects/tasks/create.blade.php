@@ -58,6 +58,20 @@
 
                     <x-admin::form.control-group class="flex-1">
                         <x-admin::form.control-group.label>
+                            @lang('admin::app.projects.tasks.create.start-date')
+                        </x-admin::form.control-group.label>
+
+                        <x-admin::form.control-group.control
+                            type="date"
+                            id="start_date"
+                            name="start_date"
+                            :value="old('start_date')"
+                            :label="trans('admin::app.projects.tasks.create.start-date')"
+                        />
+                    </x-admin::form.control-group>
+
+                    <x-admin::form.control-group class="flex-1">
+                        <x-admin::form.control-group.label>
                             @lang('admin::app.projects.tasks.create.due-date')
                         </x-admin::form.control-group.label>
 
@@ -68,6 +82,8 @@
                             :value="old('due_date')"
                             :label="trans('admin::app.projects.tasks.create.due-date')"
                         />
+
+                        <x-admin::form.control-group.error control-name="due_date" />
                     </x-admin::form.control-group>
                 </div>
 

@@ -38,7 +38,7 @@ class ProjectTaskController extends Controller
 
         $this->validateTask($request);
 
-        ProjectTask::create($request->only(['title', 'status', 'due_date', 'user_id']) + [
+        ProjectTask::create($request->only(['title', 'status', 'start_date', 'due_date', 'user_id']) + [
             'project_id' => $projectId,
         ]);
 
@@ -70,7 +70,7 @@ class ProjectTaskController extends Controller
 
         $this->validateTask($request);
 
-        $task->update($request->only(['title', 'status', 'due_date', 'user_id']));
+        $task->update($request->only(['title', 'status', 'start_date', 'due_date', 'user_id']));
 
         session()->flash('success', trans('admin::app.projects.tasks.update-success'));
 
@@ -116,6 +116,61 @@ class ProjectTaskController extends Controller
     }
 
     /**
+     * Return the project's tasks formatted for the Gantt chart (Frappe Gantt).
+     */
+    public function gantt(int $projectId): JsonResponse
+    {
+        Project::findOrFail($projectId);
+
+        $progressByStatus = [
+            'pending' => 0,
+            'in_progress' => 50,
+            'done' => 100,
+        ];
+
+        $tasks = ProjectTask::where('project_id', $projectId)
+            ->orderBy('start_date')
+            ->get()
+            ->map(function (ProjectTask $task) use ($progressByStatus) {
+                $start = $task->start_date ?? $task->created_at->toDateString();
+                $end = $task->due_date ?? \Carbon\Carbon::parse($start)->addDay()->toDateString();
+
+                if ($end <= $start) {
+                    $end = \Carbon\Carbon::parse($start)->addDay()->toDateString();
+                }
+
+                return [
+                    'id' => (string) $task->id,
+                    'name' => $task->title,
+                    'start' => $start,
+                    'end' => $end,
+                    'progress' => $progressByStatus[$task->status] ?? 0,
+                ];
+            });
+
+        return response()->json($tasks->values());
+    }
+
+    /**
+     * Update a task's start/due date (used by the Gantt chart drag/resize).
+     */
+    public function updateDates(Request $request, int $projectId, int $id): JsonResponse
+    {
+        $task = ProjectTask::where('project_id', $projectId)->findOrFail($id);
+
+        $request->validate([
+            'start_date' => 'required|date',
+            'due_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $task->update($request->only(['start_date', 'due_date']));
+
+        return response()->json([
+            'message' => trans('admin::app.projects.tasks.update-success'),
+        ]);
+    }
+
+    /**
      * Remove the specified task.
      */
     public function destroy(int $projectId, int $id): JsonResponse
@@ -138,7 +193,8 @@ class ProjectTaskController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'status' => 'required|in:pending,in_progress,done',
-            'due_date' => 'nullable|date',
+            'start_date' => 'nullable|date',
+            'due_date' => 'nullable|date|after_or_equal:start_date',
             'user_id' => 'nullable|exists:users,id',
         ]);
     }

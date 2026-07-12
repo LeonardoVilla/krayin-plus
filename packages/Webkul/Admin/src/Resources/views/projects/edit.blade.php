@@ -157,14 +157,40 @@
                 @lang('admin::app.projects.tasks.title')
             </p>
 
-            <a
-                href="{{ route('admin.projects.tasks.create', $project->id) }}"
-                class="secondary-button"
-            >
-                @lang('admin::app.projects.tasks.create-btn')
-            </a>
+            <div class="flex items-center gap-x-2.5">
+                <button
+                    type="button"
+                    id="project-tasks-view-kanban-btn"
+                    class="secondary-button"
+                    onclick="document.getElementById('project-tasks-kanban').classList.remove('hidden'); document.getElementById('project-tasks-gantt').classList.add('hidden');"
+                >
+                    @lang('admin::app.projects.tasks.gantt.view-kanban-toggle')
+                </button>
+
+                <button
+                    type="button"
+                    id="project-tasks-view-gantt-btn"
+                    class="secondary-button"
+                    onclick="document.getElementById('project-tasks-gantt').classList.remove('hidden'); document.getElementById('project-tasks-kanban').classList.add('hidden');"
+                >
+                    @lang('admin::app.projects.tasks.gantt.view-toggle')
+                </button>
+
+                <a
+                    href="{{ route('admin.projects.tasks.create', $project->id) }}"
+                    class="secondary-button"
+                >
+                    @lang('admin::app.projects.tasks.create-btn')
+                </a>
+            </div>
         </div>
 
-        @include('admin::projects.tasks.kanban', ['project' => $project])
+        <div id="project-tasks-kanban">
+            @include('admin::projects.tasks.kanban', ['project' => $project])
+        </div>
+
+        <div id="project-tasks-gantt" class="hidden">
+            @include('admin::projects.tasks.gantt', ['project' => $project])
+        </div>
     </div>
 </x-admin::layouts>

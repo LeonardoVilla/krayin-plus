@@ -12,6 +12,7 @@ class ProjectTask extends Model
         'project_id',
         'title',
         'status',
+        'start_date',
         'due_date',
         'user_id',
     ];

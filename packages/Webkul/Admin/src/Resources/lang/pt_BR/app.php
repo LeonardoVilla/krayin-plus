@@ -444,8 +444,14 @@ return [
                 'save-btn' => 'Salvar',
                 'title-field' => 'Título',
                 'status' => 'Status',
+                'start-date' => 'Data de Início',
                 'due-date' => 'Prazo',
                 'responsible' => 'Responsável',
+            ],
+            'gantt' => [
+                'view-toggle' => 'Cronograma (Gantt)',
+                'view-kanban-toggle' => 'Quadro (Kanban)',
+                'empty' => 'Cadastre tarefas com data de início e prazo para ver o cronograma.',
             ],
             'edit' => [
                 'title' => 'Editar Tarefa',
