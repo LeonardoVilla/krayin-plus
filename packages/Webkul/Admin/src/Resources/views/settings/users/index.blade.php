@@ -139,6 +139,18 @@
                                     >
                                     </span>
                                 </a>
+
+                                <a
+                                    v-if="record.actions.find(action => action.index === 'impersonate')"
+                                    :title="record.actions.find(action => action.index === 'impersonate')?.title"
+                                    @click="performAction(record.actions.find(action => action.index === 'impersonate'))"
+                                >
+                                    <span
+                                        :class="record.actions.find(action => action.index === 'impersonate')?.icon"
+                                        class="cursor-pointer rounded-md p-1.5 text-2xl transition-all hover:bg-gray-200 dark:hover:bg-gray-800 max-sm:place-self-center"
+                                    >
+                                    </span>
+                                </a>
                             </div>
                         </div>
 
@@ -183,6 +195,18 @@
                                         <a @click="performAction(record.actions.find(action => action.index === 'delete'))">
                                             <span
                                                 :class="record.actions.find(action => action.index === 'delete')?.icon"
+                                                class="cursor-pointer rounded-md p-1.5 text-2xl transition-all hover:bg-gray-200 dark:hover:bg-gray-800 max-sm:place-self-center"
+                                            >
+                                            </span>
+                                        </a>
+
+                                        <a
+                                            v-if="record.actions.find(action => action.index === 'impersonate')"
+                                            :title="record.actions.find(action => action.index === 'impersonate')?.title"
+                                            @click="performAction(record.actions.find(action => action.index === 'impersonate'))"
+                                        >
+                                            <span
+                                                :class="record.actions.find(action => action.index === 'impersonate')?.icon"
                                                 class="cursor-pointer rounded-md p-1.5 text-2xl transition-all hover:bg-gray-200 dark:hover:bg-gray-800 max-sm:place-self-center"
                                             >
                                             </span>

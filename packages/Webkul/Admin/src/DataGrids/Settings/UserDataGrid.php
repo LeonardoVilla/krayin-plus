@@ -119,7 +119,7 @@ class UserDataGrid extends DataGrid
         if ($authUser && $authUser->role && $authUser->role->permission_type === 'all') {
             $this->addAction([
                 'index' => 'impersonate',
-                'icon' => 'icon-view',
+                'icon' => 'icon-eye',
                 'title' => 'Simular',
                 'method' => 'GET',
                 'url' => fn ($row) => $row->id == $authUser->id
