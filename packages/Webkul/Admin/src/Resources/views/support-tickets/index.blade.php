@@ -14,12 +14,14 @@
             </div>
 
             <div class="flex items-center gap-x-2.5">
-                <a
-                    href="{{ route('admin.support_tickets.create') }}"
-                    class="primary-button"
-                >
-                    @lang('admin::app.support-tickets.index.create-btn')
-                </a>
+                @if (bouncer()->hasPermission('support_tickets.create'))
+                    <a
+                        href="{{ route('admin.support_tickets.create') }}"
+                        class="primary-button"
+                    >
+                        @lang('admin::app.support-tickets.index.create-btn')
+                    </a>
+                @endif
             </div>
         </div>
 

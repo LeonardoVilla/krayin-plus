@@ -14,12 +14,14 @@
             </div>
 
             <div class="flex items-center gap-x-2.5">
-                <a
-                    href="{{ route('admin.projects.create') }}"
-                    class="primary-button"
-                >
-                    @lang('admin::app.projects.index.create-btn')
-                </a>
+                @if (bouncer()->hasPermission('projects.create'))
+                    <a
+                        href="{{ route('admin.projects.create') }}"
+                        class="primary-button"
+                    >
+                        @lang('admin::app.projects.index.create-btn')
+                    </a>
+                @endif
             </div>
         </div>
 

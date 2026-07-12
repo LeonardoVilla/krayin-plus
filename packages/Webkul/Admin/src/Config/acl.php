@@ -576,5 +576,56 @@ return [
         'name' => 'admin::app.acl.configuration',
         'route' => 'admin.configuration.index',
         'sort' => 9,
+    ], [
+        'key' => 'support_tickets',
+        'name' => 'admin::app.acl.support-tickets',
+        'route' => 'admin.support_tickets.index',
+        'sort' => 10,
+    ], [
+        'key' => 'support_tickets.create',
+        'name' => 'admin::app.acl.create',
+        'route' => ['admin.support_tickets.create', 'admin.support_tickets.store'],
+        'sort' => 1,
+    ], [
+        'key' => 'support_tickets.edit',
+        'name' => 'admin::app.acl.edit',
+        'route' => ['admin.support_tickets.edit', 'admin.support_tickets.update'],
+        'sort' => 2,
+    ], [
+        'key' => 'support_tickets.delete',
+        'name' => 'admin::app.acl.delete',
+        'route' => ['admin.support_tickets.delete', 'admin.support_tickets.mass_delete'],
+        'sort' => 3,
+    ], [
+        'key' => 'projects',
+        'name' => 'admin::app.acl.projects',
+        'route' => 'admin.projects.index',
+        'sort' => 11,
+    ], [
+        'key' => 'projects.create',
+        'name' => 'admin::app.acl.create',
+        'route' => ['admin.projects.create', 'admin.projects.store'],
+        'sort' => 1,
+    ], [
+        'key' => 'projects.edit',
+        'name' => 'admin::app.acl.edit',
+        'route' => [
+            'admin.projects.edit',
+            'admin.projects.update',
+            'admin.projects.tasks.kanban',
+            'admin.projects.tasks.gantt',
+            'admin.projects.tasks.create',
+            'admin.projects.tasks.store',
+            'admin.projects.tasks.edit',
+            'admin.projects.tasks.update',
+            'admin.projects.tasks.status',
+            'admin.projects.tasks.dates',
+        ],
+        'sort' => 2,
+    ], [
+        'key' => 'projects.delete',
+        'name' => 'admin::app.acl.delete',
+        'route' => ['admin.projects.delete', 'admin.projects.mass_delete', 'admin.projects.tasks.delete'],
+        'sort' => 3,
     ],
 ];

@@ -2,6 +2,8 @@
 
 return [
     'acl' => [
+        'support-tickets' => 'Chamados',
+        'projects' => 'Projetos',
         'leads' => 'Oportunidades',
         'lead' => 'Oportunidade',
         'quotes' => 'Cotações',
