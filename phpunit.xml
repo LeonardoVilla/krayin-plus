@@ -32,5 +32,25 @@
         <env name="QUEUE_CONNECTION" value="sync" />
         <env name="SESSION_DRIVER" value="array" />
         <env name="TELESCOPE_ENABLED" value="false" />
+        <!--
+            Banco de teste dedicado (krayin_plus_testing), separado do
+            banco de desenvolvimento — os testes usam RefreshDatabase, que
+            recria as tabelas do zero a cada execucao, entao NUNCA apontar
+            isso para um banco com dados reais.
+
+            O usuario 'krayin_plus_test' e' dedicado so pra isso
+            (privilegio limitado so a esse banco). As credenciais
+            precisam ficar aqui no phpunit.xml (nao em .env.testing) por
+            causa de um bug encontrado: com .env.testing, a segunda
+            excecao HTTP (ex.: abort(401)) lancada dentro do mesmo
+            processo de teste PHP falha silenciosamente e retorna 200
+            vazio em vez do status correto. Ver Testes/README.md.
+        -->
+        <env name="DB_CONNECTION" value="mysql" />
+        <env name="DB_HOST" value="127.0.0.1" />
+        <env name="DB_PORT" value="3306" />
+        <env name="DB_DATABASE" value="krayin_plus_testing" />
+        <env name="DB_USERNAME" value="krayin_plus_test" />
+        <env name="DB_PASSWORD" value="TesteAutomatizado2026" />
     </php>
 </phpunit>

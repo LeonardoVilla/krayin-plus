@@ -78,3 +78,19 @@ function getFirstName($fullName)
 {
     return explode(' ', $fullName)[0];
 }
+
+/**
+ * Cria um usuário do Krayin (Webkul\User\Models\User) direto — o
+ * Webkul\User\Models\User não tem HasFactory, e a UserFactory padrão do
+ * Laravel aponta pro App\Models\User (modelo diferente, não usado pelo
+ * Krayin). Mais simples criar direto com Model::create().
+ */
+function makeUser(array $attributes = []): \Webkul\User\Models\User
+{
+    return \Webkul\User\Models\User::create(array_merge([
+        'name' => fake()->name(),
+        'email' => fake()->unique()->safeEmail(),
+        'password' => bcrypt('password'),
+        'status' => 1,
+    ], $attributes));
+}
