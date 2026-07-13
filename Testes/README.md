@@ -1,4 +1,4 @@
-# Testes automatizados — Fase 1
+# Testes automatizados — Fase 1 e Fase 2
 
 Data: 2026-07-12
 
@@ -45,6 +45,16 @@ vendor/bin/pest
 | `ProjectTest.php` | CRUD de Projetos, validação de datas (fim não pode ser antes do início), e que Coordenador cria/edita mas não exclui (ACL na prática) |
 
 **26 testes, 73 asserções, todos passando.**
+
+## O que está coberto (Fase 2 — regressão dos módulos customizados)
+
+| Arquivo | O que testa |
+|---|---|
+| `InvoiceConversionTest.php` | Converter Cotação em Fatura (troca de `document_type`) e que isso fica registrado na auditoria |
+| `ProjectKanbanGanttTest.php` | Endpoint do Kanban (tarefas agrupadas por status), atualização de status via drag-and-drop, endpoint do Gantt (formato Frappe Gantt, cálculo de progresso por status), atualização de datas via arrastar/redimensionar, e as validações de cada um (status inválido, data de término antes da de início) |
+| `AutomaticAuditTest.php` | Confirma que o sistema de auditoria (listeners globais no `AppServiceProvider`) cobre **qualquer** model automaticamente — testado com Pessoa, Empresa e Usuário (não são os módulos que a auditoria foi "feita para", é justamente pra provar que funciona em qualquer um sem precisar adicionar código por model), incluindo: diff correto de campo alterado, não registra quando nada muda de fato, e registra quem fez a ação |
+
+**Total combinado: 39 testes, 106 asserções, todos passando.**
 
 ## Armadilhas encontradas
 
@@ -106,11 +116,8 @@ nossa matriz de perfis sempre concede as duas chaves juntas — não afeta
 o resultado prático, só registramos aqui pra não reaparecer como
 mistério numa investigação futura.
 
-## Próximas fases (não iniciadas)
+## Próxima fase (não iniciada)
 
-- **Fase 2** — regressão dos módulos customizados: Faturas (conversão de
-  Cotação), Kanban/Gantt de Projetos, auditoria automática em todos os
-  models.
 - **Fase 3** — cobertura ampla dos módulos nativos do Krayin (Oportunidades,
   Cotações, Contatos, Produtos) — menor prioridade, é código de terceiros
   já mantido pelo Krayin upstream.
