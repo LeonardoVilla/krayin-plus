@@ -22,7 +22,12 @@ class HelpController extends Controller
     .wrap { max-width: 980px; margin: 0 auto; padding: 20px 24px 60px; }
     a.back { display:inline-block; margin-bottom: 12px; color: #443dff; text-decoration: none; }
     h1 { font-size: 22px; margin-bottom: 4px; }
-    .subtitle { color: #666; font-size: 14px; margin-bottom: 24px; }
+    .subtitle { color: #666; font-size: 14px; margin-bottom: 20px; }
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid #e0e0ea; }
+    .tab-btn { padding: 10px 20px; font-size: 14px; font-weight: bold; background: none; border: none; cursor: pointer; color: #777; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+    .tab-btn.active { color: #443dff; border-bottom-color: #443dff; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
     nav.toc { background: #fff; border-radius: 6px; padding: 14px 18px; margin-bottom: 24px; }
     nav.toc h2 { font-size: 14px; margin: 0 0 8px; color: #443dff; }
     nav.toc ol { margin: 0; padding-left: 20px; }
@@ -36,7 +41,11 @@ class HelpController extends Controller
     .step .num { flex: 0 0 26px; height: 26px; border-radius: 50%; background: #443dff; color: #fff; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
     .step .content { flex: 1; font-size: 13.5px; line-height: 1.5; }
     .step .content b { color: #1a1c26; }
+    .step .fields { margin: 6px 0 0; padding-left: 18px; font-size: 13px; color: #555; }
+    .step .fields li { margin-bottom: 3px; }
     .badge-new { display: inline-block; background: #2e7d32; color: #fff; font-size: 10px; font-weight: bold; padding: 1px 7px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+    .scenario-title { font-size: 15px; font-weight: bold; color: #1a1c26; margin: 22px 0 12px; padding-top: 14px; border-top: 1px dashed #e0e0ea; }
+    .scenario-title:first-child { margin-top: 0; padding-top: 0; border-top: none; }
     ul.feature-list { padding-left: 18px; font-size: 13.5px; line-height: 1.6; }
     ul.feature-list li { margin-bottom: 6px; }
     table.perfis { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
@@ -52,7 +61,14 @@ class HelpController extends Controller
 
 <a class="back" href="/admin/dashboard">&laquo; Voltar ao painel</a>
 <h1>Manual de Ajuda — Krayin CRM (SENAC-MT)</h1>
-<div class="subtitle">Guia de uso do sistema: por onde começar e como usar cada funcionalidade, incluindo as novidades mais recentes.</div>
+<div class="subtitle">Guia de uso do sistema: como configurar e como trabalhar no dia a dia.</div>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="showTab('geral')" id="btn-geral">Uso Geral</button>
+    <button class="tab-btn" onclick="showTab('diario')" id="btn-diario">Trabalho Diário</button>
+</div>
+
+<div id="tab-geral" class="tab-panel active">
 
 <nav class="toc">
     <h2>Índice</h2>
@@ -91,7 +107,7 @@ class HelpController extends Controller
     </div></div>
 
     <div class="step"><div class="num">5</div><div class="content">
-        <b>Comece a operação diária:</b> registre <b>Oportunidades</b> (interessados no curso) → converta em <b>Cotação</b> quando fechar o valor → gere a <b>Fatura</b> quando confirmar a matrícula → abra um <b>Projeto</b> para acompanhar a turma → use <b>Chamados</b> para dúvidas e suporte pós-matrícula.
+        <b>Comece a operação diária:</b> registre <b>Oportunidades</b> (interessados no curso) → converta em <b>Cotação</b> quando fechar o valor → gere a <b>Fatura</b> quando confirmar a matrícula → abra um <b>Projeto</b> para acompanhar a turma → use <b>Chamados</b> para dúvidas e suporte pós-matrícula. Veja o passo a passo detalhado na aba <b>Trabalho Diário</b>.
     </div></div>
 
     <div class="note">Dica: se quiser testar o fluxo completo sem usar dados reais, veja a seção <a href="#dados-demo">Dados de demonstração</a> — ela cria (e depois remove) 3 exemplos completos de venda de curso.</div>
@@ -186,6 +202,139 @@ class HelpController extends Controller
     <p><code>php artisan demo:sales-data --clear</code></p>
     <div class="note">Este comando é operado pela equipe de TI via terminal — não há botão na interface para isso, propositalmente, para evitar geração acidental de dados fictícios por usuários comuns. Em ambiente de produção, o comando exige uma confirmação explícita antes de criar qualquer dado.</div>
 </section>
+
+</div>
+
+<div id="tab-diario" class="tab-panel">
+
+<nav class="toc">
+    <h2>Cenários</h2>
+    <ol>
+        <li><a href="#cenario-novo-contato">Atendimento novo: interessado em um curso</a></li>
+        <li><a href="#cenario-fechou-venda">Venda fechada: gerar cotação, fatura e projeto</a></li>
+        <li><a href="#cenario-chamado">Aluno já matriculado com dúvida/problema</a></li>
+        <li><a href="#cenario-turma">Acompanhar a turma no dia a dia (Kanban/Gantt)</a></li>
+    </ol>
+</nav>
+
+<section id="cenario-novo-contato">
+    <div class="scenario-title">Cenário 1 — Chegou um novo interessado em um curso (primeiro contato)</div>
+    <p style="font-size:13.5px;color:#666;margin-top:-6px;">Ligação, WhatsApp ou e-mail de alguém perguntando sobre um curso. Preencha nesta ordem:</p>
+
+    <div class="step"><div class="num">1</div><div class="content">
+        <b>Verifique se a pessoa já existe.</b> Vá em <code>Contatos → Pessoas</code> e pesquise pelo nome, e-mail ou telefone. Se já existir, use o cadastro existente (não crie duplicado). Se não existir, clique em <b>Criar Pessoa</b> e preencha:
+        <ul class="fields">
+            <li><b>Nome completo</b> (obrigatório)</li>
+            <li><b>E-mail</b> e <b>Telefone</b> (para contato posterior)</li>
+            <li><b>Organização</b>, se ele vier de uma empresa parceira (opcional)</li>
+        </ul>
+    </div></div>
+
+    <div class="step"><div class="num">2</div><div class="content">
+        <b>Crie a Oportunidade.</b> Vá em <code>Oportunidades → Criar Oportunidade</code> e preencha:
+        <ul class="fields">
+            <li><b>Título</b> — ex.: "Excel Avançado — João da Silva"</li>
+            <li><b>Pessoa</b> — selecione o contato criado no passo 1</li>
+            <li><b>Origem</b> — de onde veio o contato (indicação, site, telefone, etc.)</li>
+            <li><b>Estágio</b> — deixe como "Novo" (o padrão inicial do funil)</li>
+            <li><b>Produto de interesse</b> — o curso que a pessoa perguntou</li>
+        </ul>
+    </div></div>
+
+    <div class="step"><div class="num">3</div><div class="content">
+        <b>Registre o que foi conversado.</b> Dentro da própria Oportunidade, adicione uma <b>Atividade</b> (ligação, e-mail ou nota) descrevendo o que foi combinado e, se houver, a data do próximo contato. Isso evita perder o histórico se outro atendente pegar o caso depois.
+    </div></div>
+
+    <div class="note">A partir daqui, conforme a negociação avança, arraste o cartão da Oportunidade no Kanban do funil (Novo → Contato → Negociação) ou edite o campo Estágio diretamente.</div>
+</section>
+
+<section id="cenario-fechou-venda">
+    <div class="scenario-title">Cenário 2 — O interessado decidiu se matricular (venda fechada)</div>
+
+    <div class="step"><div class="num">1</div><div class="content">
+        <b>Gere a Cotação</b> a partir da Oportunidade (botão "Criar Cotação" dentro da tela da Oportunidade). Preencha:
+        <ul class="fields">
+            <li><b>Produto(s)</b> — o(s) curso(s) — com quantidade e valor</li>
+            <li><b>Validade da proposta</b>, se aplicável</li>
+        </ul>
+    </div></div>
+
+    <div class="step"><div class="num">2</div><div class="content">
+        <b>Quando o pagamento/matrícula for confirmado</b>, abra a Cotação e mude o campo <b>Tipo</b> de "Cotação" para <b>Fatura</b>, e salve. Isso sinaliza que a venda está fechada (veja a aba Uso Geral → item 3 para detalhes).
+    </div></div>
+
+    <div class="step"><div class="num">3</div><div class="content">
+        <b>Marque a Oportunidade como Ganha</b>, mudando o Estágio para "Ganho/Matriculado".
+    </div></div>
+
+    <div class="step"><div class="num">4</div><div class="content">
+        <b>Crie o Projeto de acompanhamento da turma.</b> Vá em <code>Projetos → Criar Projeto</code> e preencha:
+        <ul class="fields">
+            <li><b>Nome do projeto</b> — ex.: "Turma Excel Avançado — Julho/2026"</li>
+            <li><b>Oportunidade de origem</b> — vincule à Oportunidade do passo anterior, para manter o histórico</li>
+            <li><b>Data de início e fim</b> da turma</li>
+        </ul>
+        Depois, cadastre as <b>Tarefas</b> do projeto (ex.: confirmar material didático, enviar boas-vindas, marcar aula inaugural) — veja o Cenário 4 abaixo.
+    </div></div>
+</section>
+
+<section id="cenario-chamado">
+    <div class="scenario-title">Cenário 3 — Aluno já matriculado liga com uma dúvida ou problema</div>
+
+    <div class="step"><div class="num">1</div><div class="content">
+        <b>Localize o Contato</b> em <code>Contatos → Pessoas</code> (mesma pessoa já cadastrada quando ele virou interessado).
+    </div></div>
+
+    <div class="step"><div class="num">2</div><div class="content">
+        <b>Abra um Chamado.</b> Vá em <code>Chamados → Criar Chamado</code> e preencha:
+        <ul class="fields">
+            <li><b>Título</b> — resumo curto do problema/dúvida</li>
+            <li><b>Descrição</b> — detalhe completo do que foi relatado</li>
+            <li><b>Contato</b> — vincule à pessoa localizada no passo 1</li>
+            <li><b>Prioridade</b> — baixa, média, alta (conforme urgência)</li>
+            <li><b>Status</b> — deixe como "Aberto"</li>
+        </ul>
+    </div></div>
+
+    <div class="step"><div class="num">3</div><div class="content">
+        <b>Acompanhe até resolver.</b> Vá atualizando o <b>Status</b> do chamado ("Em andamento" → "Resolvido" → "Fechado") conforme o atendimento avança, para que outros colegas saibam o andamento sem precisar perguntar.
+    </div></div>
+</section>
+
+<section id="cenario-turma">
+    <div class="scenario-title">Cenário 4 — Acompanhar o dia a dia de uma turma (Kanban e Gantt)</div>
+
+    <div class="step"><div class="num">1</div><div class="content">
+        <b>Adicione uma Tarefa ao Projeto.</b> Dentro do Projeto, clique em "Nova Tarefa" e preencha:
+        <ul class="fields">
+            <li><b>Título</b> da tarefa (ex.: "Enviar material didático")</li>
+            <li><b>Responsável</b> pela execução</li>
+            <li><b>Data de início</b> e <b>Data de término</b> (usadas no Gantt)</li>
+            <li><b>Status inicial</b> — normalmente "Pendente"</li>
+        </ul>
+    </div></div>
+
+    <div class="step"><div class="num">2</div><div class="content">
+        <b>No quadro Kanban do Projeto</b>, arraste o cartão da tarefa entre as colunas conforme o andamento real (Pendente → Em andamento → Concluída). Isso atualiza o status automaticamente.
+    </div></div>
+
+    <div class="step"><div class="num">3</div><div class="content">
+        <b>Na aba Gantt do Projeto</b>, visualize todas as tarefas na linha do tempo. Se um prazo mudar, arraste a barra da tarefa para a nova data — não precisa editar o cadastro manualmente.
+    </div></div>
+</section>
+
+</div>
+
+<script>
+function showTab(name) {
+    document.getElementById('tab-geral').classList.remove('active');
+    document.getElementById('tab-diario').classList.remove('active');
+    document.getElementById('btn-geral').classList.remove('active');
+    document.getElementById('btn-diario').classList.remove('active');
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('btn-' + name).classList.add('active');
+}
+</script>
 
 </div>
 </body>
