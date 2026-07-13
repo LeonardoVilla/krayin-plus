@@ -66,9 +66,21 @@ class ImpersonateController extends Controller
 
         $target = $this->userRepository->findOrFail($id);
 
+        /**
+         * Se a simulação começou pela tela de Usuários (Configurações),
+         * ao encerrar volta pra lá. Se começou pelo atalho da navbar
+         * (modal rápido, disponível em qualquer tela), ao encerrar
+         * permanece na mesma tela onde estava.
+         */
+        $referer = request()->headers->get('referer', '');
+
+        $origin = str_contains($referer, '/admin/settings/users') ? 'users_page' : 'navbar';
+
         session([
             'impersonator_id' => $actingUser->id,
             'impersonator_name' => $actingUser->name,
+            'impersonator_origin' => $origin,
+            'impersonator_return_url' => $origin === 'navbar' ? $referer : null,
         ]);
 
         $this->logImpersonation('impersonate_start', $actingUser, $target);
@@ -97,11 +109,19 @@ class ImpersonateController extends Controller
 
         $this->logImpersonation('impersonate_stop', $original, $target);
 
-        session()->forget(['impersonator_id', 'impersonator_name']);
+        $origin = session('impersonator_origin', 'users_page');
+
+        $returnUrl = session('impersonator_return_url');
+
+        session()->forget(['impersonator_id', 'impersonator_name', 'impersonator_origin', 'impersonator_return_url']);
 
         auth()->guard('user')->loginUsingId($original->id);
 
         session()->flash('success', 'Você voltou para o seu usuário.');
+
+        if ($origin === 'navbar' && $returnUrl) {
+            return redirect()->to($returnUrl);
+        }
 
         return redirect()->route('admin.settings.users.index');
     }
