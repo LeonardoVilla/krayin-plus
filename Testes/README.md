@@ -1,4 +1,4 @@
-# Testes automatizados — Fase 1 e Fase 2
+# Testes automatizados — Fases 1, 2 e 3
 
 Data: 2026-07-12
 
@@ -54,7 +54,18 @@ vendor/bin/pest
 | `ProjectKanbanGanttTest.php` | Endpoint do Kanban (tarefas agrupadas por status), atualização de status via drag-and-drop, endpoint do Gantt (formato Frappe Gantt, cálculo de progresso por status), atualização de datas via arrastar/redimensionar, e as validações de cada um (status inválido, data de término antes da de início) |
 | `AutomaticAuditTest.php` | Confirma que o sistema de auditoria (listeners globais no `AppServiceProvider`) cobre **qualquer** model automaticamente — testado com Pessoa, Empresa e Usuário (não são os módulos que a auditoria foi "feita para", é justamente pra provar que funciona em qualquer um sem precisar adicionar código por model), incluindo: diff correto de campo alterado, não registra quando nada muda de fato, e registra quem fez a ação |
 
-**Total combinado: 39 testes, 106 asserções, todos passando.**
+**Total combinado (Fase 1 + 2): 39 testes, 106 asserções, todos passando.**
+
+## O que está coberto (Fase 3 — módulos nativos do Krayin)
+
+| Arquivo | O que testa |
+|---|---|
+| `LeadTest.php` | Visualizar Oportunidade, mover de estágio no funil de vendas, excluir (individual e em massa). A criação via HTTP não é testada — o formulário de criação usa uma engine de validação dinâmica orientada por atributos customizáveis (`LeadForm`), então a Oportunidade é criada direto via Eloquent (mesmo comportamento real) e testamos as ações de negócio pela rota HTTP de verdade |
+| `QuoteTest.php` | Visualizar, imprimir, excluir (individual e em massa) — complementa o `InvoiceConversionTest.php` da Fase 2 |
+| `OrganizationTest.php` | CRUD completo de Empresa via HTTP (nome é o único campo obrigatório, então dá pra testar o formulário de verdade) |
+| `ProductTest.php` | CRUD completo de Produto via HTTP, validação de SKU obrigatório, e o que acontece com SKU duplicado (ver armadilha nº 4 abaixo) |
+
+**Total combinado (Fase 1 + 2 + 3): 52 testes, 143 asserções, todos passando.**
 
 ## Armadilhas encontradas
 
@@ -116,8 +127,41 @@ nossa matriz de perfis sempre concede as duas chaves juntas — não afeta
 o resultado prático, só registramos aqui pra não reaparecer como
 mistério numa investigação futura.
 
-## Próxima fase (não iniciada)
+### 4 — Formulários com validação dinâmica só validam campo que está *presente* na requisição
 
-- **Fase 3** — cobertura ampla dos módulos nativos do Krayin (Oportunidades,
-  Cotações, Contatos, Produtos) — menor prioridade, é código de terceiros
-  já mantido pelo Krayin upstream.
+Vários formulários nativos do Krayin (Produto, Empresa, Oportunidade) usam
+uma classe `AttributeForm`/`LeadForm` que monta as regras de validação
+**em tempo de execução**, olhando quais chaves existem no payload da
+requisição (`array_keys(request()->all())`) e cruzando com os atributos
+customizáveis cadastrados. **Consequência prática:** se você não manda a
+chave `sku` no payload, a regra de "obrigatório" nem chega a ser
+verificada — é como se o campo não existisse pro validador, não é
+"obrigatório e vazio". Pra testar "obrigatório" de verdade, é preciso
+mandar a chave presente só que vazia (`'sku' => ''`), não omiti-la.
+Achamos isso tentando testar "não cria produto sem SKU" e "não cria
+empresa sem nome" mandando o payload sem essas chaves — passava direto
+sem erro nenhum, porque a validação nunca era acionada.
+
+### 5 — SKU duplicado quebra com erro 500, não com validação amigável
+
+A coluna `sku` da tabela `products` tem uma constraint `UNIQUE` no banco,
+mas o atributo `sku` **não** está marcado como `is_unique` no cadastro de
+atributos — ou seja, não existe checagem de duplicidade no nível de
+formulário. Cadastrar um SKU repetido não retorna um erro de validação
+elegante; a query de `INSERT` estoura uma
+`Illuminate\Database\UniqueConstraintViolationException` no banco, que o
+Laravel converte numa resposta HTTP `500` (erro de servidor), não uma
+resposta `422`/redirect com `session()->errors`. Não corrigimos isso (não
+foi pedido), só documentamos e testamos o comportamento real (`assertStatus(500)`)
+em vez do comportamento "ideal" que não existe.
+
+### 6 — Tela de visualização de Oportunidade quebra se a Pessoa não tem e-mail/telefone
+
+`leads/view/person.blade.php` faz `@foreach ($lead->person->emails as ...)`
+e `@foreach ($lead->person->contact_numbers as ...)` sem checar se esses
+campos são nulos primeiro. Uma Pessoa criada só com `name` (sem e-mails
+nem telefones) — o que é perfeitamente válido no cadastro — faz a tela de
+visualização da Oportunidade vinculada a ela quebrar com "foreach()
+argument must be of type array|object, null given". É um bug real do
+Krayin (não introduzido por nós); contornamos no teste sempre criando a
+Pessoa de teste com `'emails' => []` e `'contact_numbers' => []`.
