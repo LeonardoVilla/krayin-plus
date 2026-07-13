@@ -2303,6 +2303,7 @@ return [
         'back' => 'Voltar',
         'name' => 'Nome',
         'configuration' => 'Configuração',
+        'help' => 'Ajuda',
         'howdy' => 'Olá!',
         'warehouses' => 'Depósitos',
         'warehouse' => 'Depósito',

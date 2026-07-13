@@ -64,3 +64,8 @@ require 'rest-routes.php';
  * Audit log routes.
  */
 require 'audit-log-routes.php';
+
+/**
+ * Help routes.
+ */
+require 'help-routes.php';
