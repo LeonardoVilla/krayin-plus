@@ -21,6 +21,23 @@ class Bouncer
         }
 
         /**
+         * Durante uma simulação de usuário (impersonation), a sessão é
+         * só-leitura — não importa o que o papel do usuário simulado
+         * normalmente permitiria. Bloqueia qualquer requisição que não
+         * seja GET/HEAD, com a única exceção da própria rota de encerrar
+         * a simulação (senão ninguém consegue voltar pro usuário real).
+         */
+        if (
+            session()->has('impersonator_id')
+            && ! in_array($request->method(), ['GET', 'HEAD'])
+            && Route::currentRouteName() !== 'admin.settings.users.impersonate.stop'
+        ) {
+            session()->flash('error', 'Durante uma simulação de usuário, o acesso é somente leitura — não é possível criar, editar ou excluir nada.');
+
+            return redirect()->back();
+        }
+
+        /**
          * If user status is changed by admin. Then session should be
          * logged out.
          */

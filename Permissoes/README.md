@@ -235,3 +235,46 @@ com `model_type='Impersonation'`).
 | `packages/Webkul/Admin/src/Routes/Admin/settings-routes.php` | Rotas de impersonate |
 | `packages/Webkul/Admin/src/Resources/views/components/layouts/index.blade.php` | Banner amarelo de simulação ativa |
 | `app/Http/Controllers/AuditLogController.php` | Correção do bug `Array to string conversion` |
+
+---
+
+# Simulação de usuário é somente-leitura
+
+Data: 2026-07-12 (terceira etapa, a pedido do usuário)
+
+## Regra
+
+Enquanto uma simulação de usuário está ativa, a sessão só pode **ler**
+— criar, editar e excluir ficam bloqueados, **mesmo que o usuário
+simulado tenha permissão de sobra pra fazer isso normalmente**. A trava
+não olha o papel/permissão de ninguém, olha só "existe uma simulação
+ativa nessa sessão?".
+
+## Onde foi implementado
+
+Uma única checagem no topo do `Webkul\Admin\Http\Middleware\Bouncer`
+(que já roda em toda rota `/admin/*`, é o mesmo middleware que aplica o
+resto do controle de acesso): se a sessão tem `impersonator_id` e a
+requisição não é `GET`/`HEAD`, bloqueia com uma mensagem e redireciona
+de volta — com uma única exceção: a própria rota de encerrar a
+simulação (`admin.settings.users.impersonate.stop`) continua liberada,
+senão ninguém conseguiria voltar pro usuário real.
+
+## Por que no middleware, e não nas rotas de impersonate
+
+A trava não fica no `ImpersonateController` — ela protege **todas as
+outras** rotas do sistema durante a simulação (criar Lead, editar
+Produto, excluir Chamado, etc.), então o lugar certo é o middleware
+global que já intercepta tudo, não um controller específico.
+
+## Testado
+
+- Simulando um usuário com **acesso total** (`permission_type=all`) —
+  de propósito, pra provar que a trava não depende do papel do usuário
+  simulado — tentativa de criar um Chamado via `POST` foi bloqueada
+  (redirecionamento, nada foi criado no banco)
+- `GET` continua funcionando normalmente durante a simulação
+- A rota de encerrar simulação continua acessível mesmo com a trava
+  ativa
+- Confirmado com requisições HTTP reais (`curl`) no servidor, além dos
+  testes automatizados (`ImpersonationTest.php`, Fase 1)

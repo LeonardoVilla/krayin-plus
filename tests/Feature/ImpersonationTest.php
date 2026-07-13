@@ -80,6 +80,57 @@ it('não é possível simular um segundo usuário com uma simulação já ativa'
     expect(auth()->guard('user')->user()->id)->toBe($targetA->id);
 });
 
+it('durante a simulação, não é possível criar, editar ou excluir nada (só leitura)', function () {
+    $admin = makeUser([
+        'role_id' => Role::where('permission_type', 'all')->firstOrFail()->id,
+        'status' => 1,
+    ]);
+
+    // simula um alvo COM acesso total — mesmo assim, a trava de
+    // somente-leitura tem que bloquear, porque ela não depende da
+    // permissão do usuário simulado.
+    $target = makeUser([
+        'role_id' => Role::where('permission_type', 'all')->firstOrFail()->id,
+        'status' => 1,
+    ]);
+
+    test()->actingAs($admin)->get(route('admin.settings.users.impersonate.start', $target->id));
+
+    expect(auth()->guard('user')->user()->id)->toBe($target->id);
+
+    // GET continua liberado normalmente
+    test()->get(route('admin.leads.index'))->assertOk();
+
+    // POST/PUT/DELETE ficam bloqueados, mesmo o usuário simulado tendo
+    // permissão de sobra pra isso
+    test()->post(route('admin.support_tickets.store'), [
+        'subject' => 'Tentativa durante simulação',
+        'status' => 'open',
+        'priority' => 'low',
+    ])->assertRedirect();
+
+    expect(\App\Models\SupportTicket::where('subject', 'Tentativa durante simulação')->exists())->toBeFalse();
+});
+
+it('a rota de encerrar simulação continua funcionando mesmo com a trava de somente-leitura', function () {
+    $admin = makeUser([
+        'role_id' => Role::where('permission_type', 'all')->firstOrFail()->id,
+        'status' => 1,
+    ]);
+
+    $target = makeUser([
+        'role_id' => Role::where('name', 'Estagiário')->firstOrFail()->id,
+        'status' => 1,
+    ]);
+
+    test()->actingAs($admin)->get(route('admin.settings.users.impersonate.start', $target->id));
+
+    test()->get(route('admin.settings.users.impersonate.stop'));
+
+    expect(auth()->guard('user')->user()->id)->toBe($admin->id);
+    expect(session()->has('impersonator_id'))->toBeFalse();
+});
+
 it('início e fim da simulação ficam registrados na auditoria', function () {
     $admin = makeUser([
         'role_id' => Role::where('permission_type', 'all')->firstOrFail()->id,
