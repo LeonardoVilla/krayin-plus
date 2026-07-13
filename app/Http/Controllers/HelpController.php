@@ -54,6 +54,12 @@ class HelpController extends Controller
     code { background: #f0f0f5; padding: 1px 6px; border-radius: 3px; font-size: 12.5px; }
     .note { background: #fff8e1; border-left: 4px solid #f9a825; padding: 10px 14px; font-size: 13px; border-radius: 0 4px 4px 0; margin-top: 10px; }
     .warn { background: #ffebee; border-left: 4px solid #c62828; padding: 10px 14px; font-size: 13px; border-radius: 0 4px 4px 0; margin-top: 10px; }
+    .checklist { list-style: none; padding-left: 0; margin: 10px 0 0; }
+    .checklist li { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #f0f0f5; font-size: 13.5px; line-height: 1.5; }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist .check { flex: 0 0 20px; color: #2e7d32; font-weight: bold; font-size: 15px; }
+    .checklist b { color: #1a1c26; }
+    .essential { display: inline-block; background: #c62828; color: #fff; font-size: 10px; font-weight: bold; padding: 1px 7px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
 </style>
 </head>
 <body>
@@ -208,18 +214,37 @@ class HelpController extends Controller
 <div id="tab-diario" class="tab-panel">
 
 <nav class="toc">
-    <h2>Cenários</h2>
+    <h2>Nesta aba</h2>
     <ol>
-        <li><a href="#cenario-novo-contato">Atendimento novo: interessado em um curso</a></li>
-        <li><a href="#cenario-fechou-venda">Venda fechada: gerar cotação, fatura e projeto</a></li>
+        <li><a href="#pre-atendimento">Cadastro pré-atendimento — o que precisa estar pronto antes de começar</a></li>
+        <li><a href="#cenario-atendimento-zero">Atendimento do zero: do primeiro contato até a matrícula</a></li>
         <li><a href="#cenario-chamado">Aluno já matriculado com dúvida/problema</a></li>
         <li><a href="#cenario-turma">Acompanhar a turma no dia a dia (Kanban/Gantt)</a></li>
     </ol>
 </nav>
 
-<section id="cenario-novo-contato">
-    <div class="scenario-title">Cenário 1 — Chegou um novo interessado em um curso (primeiro contato)</div>
-    <p style="font-size:13.5px;color:#666;margin-top:-6px;">Ligação, WhatsApp ou e-mail de alguém perguntando sobre um curso. Preencha nesta ordem:</p>
+<section id="pre-atendimento">
+    <div class="scenario-title">Cadastro pré-atendimento <span class="essential">Essencial</span></div>
+    <p style="font-size:13.5px;color:#666;margin-top:-6px;">Antes de atender o primeiro interessado, confira se estes cadastros básicos já existem no sistema. Sem eles, o atendimento trava no meio do caminho (ex.: não tem estágio pra escolher, não tem curso pra vincular). Normalmente é responsabilidade do Gestor/TI deixar isso pronto uma única vez, não do atendente em cada ligação.</p>
+
+    <ul class="checklist">
+        <li><span class="check">✓</span><div><b>Meu usuário existe e tem um Papel definido.</b> Confirme em <code>Configurações → Usuário → Usuários</code> que você está cadastrado com o perfil correto (Vendas, Suporte, Gestor, etc.) — sem isso você nem consegue ver os menus necessários.</div></li>
+
+        <li><span class="check">✓</span><div><b>Estágios do funil de vendas configurados.</b> Em <code>Configurações → Oportunidade → Estágios</code>, deve existir pelo menos: Novo, Em negociação e Ganho/Matriculado (e um estágio de Perdido). Sem isso a Oportunidade não tem para onde avançar.</div></li>
+
+        <li><span class="check">✓</span><div><b>Origens cadastradas.</b> Em <code>Configurações → Oportunidade → Origens</code>, tenha as formas mais comuns de chegada do interessado (ex.: Telefone, WhatsApp, Site, Indicação) — usado no passo 2 do atendimento abaixo.</div></li>
+
+        <li><span class="check">✓</span><div><b>Cursos cadastrados como Produto.</b> Em <code>Produtos</code>, cada curso ofertado precisa existir com SKU, nome e preço <b>antes</b> de qualquer Cotação poder ser gerada. Sem o curso cadastrado, a venda não pode ser fechada.</div></li>
+
+        <li><span class="check">✓</span><div><b>(Opcional) Organizações parceiras.</b> Se o SENAC já tem parcerias fechadas com empresas que enviam grupos de alunos, cadastre a Organização em <code>Contatos → Organizações</code> com antecedência — assim, no atendimento, basta vincular em vez de digitar tudo de novo.</div></li>
+    </ul>
+
+    <div class="note">Se algum desses itens não existir ainda, avise o Gestor/TI antes de tentar atender — não dá para "contornar" a falta de um estágio ou de um curso cadastrado no meio do atendimento.</div>
+</section>
+
+<section id="cenario-atendimento-zero">
+    <div class="scenario-title">Atendimento do zero — do primeiro contato até a matrícula</div>
+    <p style="font-size:13.5px;color:#666;margin-top:-6px;">Ligação, WhatsApp ou e-mail de alguém perguntando sobre um curso, do início ao fim. Preencha nesta ordem exata:</p>
 
     <div class="step"><div class="num">1</div><div class="content">
         <b>Verifique se a pessoa já existe.</b> Vá em <code>Contatos → Pessoas</code> e pesquise pelo nome, e-mail ou telefone. Se já existir, use o cadastro existente (não crie duplicado). Se não existir, clique em <b>Criar Pessoa</b> e preencha:
@@ -235,9 +260,9 @@ class HelpController extends Controller
         <ul class="fields">
             <li><b>Título</b> — ex.: "Excel Avançado — João da Silva"</li>
             <li><b>Pessoa</b> — selecione o contato criado no passo 1</li>
-            <li><b>Origem</b> — de onde veio o contato (indicação, site, telefone, etc.)</li>
+            <li><b>Origem</b> — de onde veio o contato (indicação, site, telefone, etc. — deve já existir, veja o pré-atendimento)</li>
             <li><b>Estágio</b> — deixe como "Novo" (o padrão inicial do funil)</li>
-            <li><b>Produto de interesse</b> — o curso que a pessoa perguntou</li>
+            <li><b>Produto de interesse</b> — o curso que a pessoa perguntou (deve já existir cadastrado)</li>
         </ul>
     </div></div>
 
@@ -245,41 +270,41 @@ class HelpController extends Controller
         <b>Registre o que foi conversado.</b> Dentro da própria Oportunidade, adicione uma <b>Atividade</b> (ligação, e-mail ou nota) descrevendo o que foi combinado e, se houver, a data do próximo contato. Isso evita perder o histórico se outro atendente pegar o caso depois.
     </div></div>
 
-    <div class="note">A partir daqui, conforme a negociação avança, arraste o cartão da Oportunidade no Kanban do funil (Novo → Contato → Negociação) ou edite o campo Estágio diretamente.</div>
-</section>
+    <div class="step"><div class="num">4</div><div class="content">
+        <b>Acompanhe a negociação.</b> Conforme o interessado avança, arraste o cartão da Oportunidade no Kanban do funil (Novo → Em negociação) ou edite o campo Estágio diretamente. Registre novas Atividades a cada contato relevante.
+    </div></div>
 
-<section id="cenario-fechou-venda">
-    <div class="scenario-title">Cenário 2 — O interessado decidiu se matricular (venda fechada)</div>
-
-    <div class="step"><div class="num">1</div><div class="content">
-        <b>Gere a Cotação</b> a partir da Oportunidade (botão "Criar Cotação" dentro da tela da Oportunidade). Preencha:
+    <div class="step"><div class="num">5</div><div class="content">
+        <b>Gere a Cotação</b> a partir da Oportunidade (botão "Criar Cotação" dentro da tela da Oportunidade), quando o valor for negociado. Preencha:
         <ul class="fields">
             <li><b>Produto(s)</b> — o(s) curso(s) — com quantidade e valor</li>
             <li><b>Validade da proposta</b>, se aplicável</li>
         </ul>
     </div></div>
 
-    <div class="step"><div class="num">2</div><div class="content">
+    <div class="step"><div class="num">6</div><div class="content">
         <b>Quando o pagamento/matrícula for confirmado</b>, abra a Cotação e mude o campo <b>Tipo</b> de "Cotação" para <b>Fatura</b>, e salve. Isso sinaliza que a venda está fechada (veja a aba Uso Geral → item 3 para detalhes).
     </div></div>
 
-    <div class="step"><div class="num">3</div><div class="content">
+    <div class="step"><div class="num">7</div><div class="content">
         <b>Marque a Oportunidade como Ganha</b>, mudando o Estágio para "Ganho/Matriculado".
     </div></div>
 
-    <div class="step"><div class="num">4</div><div class="content">
+    <div class="step"><div class="num">8</div><div class="content">
         <b>Crie o Projeto de acompanhamento da turma.</b> Vá em <code>Projetos → Criar Projeto</code> e preencha:
         <ul class="fields">
             <li><b>Nome do projeto</b> — ex.: "Turma Excel Avançado — Julho/2026"</li>
-            <li><b>Oportunidade de origem</b> — vincule à Oportunidade do passo anterior, para manter o histórico</li>
+            <li><b>Oportunidade de origem</b> — vincule à Oportunidade do passo 2, para manter o histórico completo</li>
             <li><b>Data de início e fim</b> da turma</li>
         </ul>
-        Depois, cadastre as <b>Tarefas</b> do projeto (ex.: confirmar material didático, enviar boas-vindas, marcar aula inaugural) — veja o Cenário 4 abaixo.
+        Depois, cadastre as <b>Tarefas</b> do projeto (ex.: confirmar material didático, enviar boas-vindas, marcar aula inaugural) — veja "Acompanhar a turma" abaixo.
     </div></div>
+
+    <div class="note">Pronto: o atendimento passou por todas as etapas — de "interessado desconhecido" até "aluno matriculado com turma sendo acompanhada". Se em algum momento o interessado desistir, mude o Estágio da Oportunidade para "Perdido" em vez de excluir o registro — mantém o histórico para relatórios futuros.</div>
 </section>
 
 <section id="cenario-chamado">
-    <div class="scenario-title">Cenário 3 — Aluno já matriculado liga com uma dúvida ou problema</div>
+    <div class="scenario-title">Aluno já matriculado liga com uma dúvida ou problema</div>
 
     <div class="step"><div class="num">1</div><div class="content">
         <b>Localize o Contato</b> em <code>Contatos → Pessoas</code> (mesma pessoa já cadastrada quando ele virou interessado).
@@ -302,7 +327,7 @@ class HelpController extends Controller
 </section>
 
 <section id="cenario-turma">
-    <div class="scenario-title">Cenário 4 — Acompanhar o dia a dia de uma turma (Kanban e Gantt)</div>
+    <div class="scenario-title">Acompanhar o dia a dia de uma turma (Kanban e Gantt)</div>
 
     <div class="step"><div class="num">1</div><div class="content">
         <b>Adicione uma Tarefa ao Projeto.</b> Dentro do Projeto, clique em "Nova Tarefa" e preencha:
