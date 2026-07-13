@@ -34,7 +34,7 @@ use Webkul\User\Models\User;
  */
 class DemoSalesData extends Command
 {
-    protected $signature = 'demo:sales-data {--clear : Remove os dados de demonstração em vez de criar}';
+    protected $signature = 'demo:sales-data {--clear : Remove os dados de demonstração em vez de criar} {--force : Pula a confirmação extra exigida em produção}';
 
     protected $description = 'Cria ou remove dados de demonstração de venda de cursos (Oportunidades + Projetos)';
 
@@ -56,11 +56,43 @@ class DemoSalesData extends Command
         return $this->seed();
     }
 
+    /**
+     * Trava extra de segurança: em produção, cria dado fictício num
+     * sistema que pode já estar sendo usado de verdade. Exige digitar
+     * uma frase exata (não basta "sim/não") pra reduzir o risco de rodar
+     * sem querer — ou passar --force pra pular a pergunta (útil em
+     * scripts/automação, usar com cuidado).
+     */
+    private function confirmProduction(): bool
+    {
+        if ($this->option('force')) {
+            return true;
+        }
+
+        $this->warn('⚠ Este ambiente está configurado como PRODUÇÃO (APP_ENV=production).');
+        $this->warn('Isso vai criar dados FICTÍCIOS (Oportunidades, Projetos, Clientes) misturados com dados reais.');
+        $this->newLine();
+
+        $answer = $this->ask('Pra confirmar, digite exatamente: CRIAR DADOS DE TESTE');
+
+        if ($answer !== 'CRIAR DADOS DE TESTE') {
+            $this->error('Confirmação não corresponde. Operação cancelada, nada foi criado.');
+
+            return false;
+        }
+
+        return true;
+    }
+
     private function seed(): int
     {
         if (File::exists($this->manifestPath)) {
             $this->error('Já existem dados de demonstração criados. Rode com --clear antes de gerar de novo.');
 
+            return self::FAILURE;
+        }
+
+        if (app()->environment('production') && ! $this->confirmProduction()) {
             return self::FAILURE;
         }
 

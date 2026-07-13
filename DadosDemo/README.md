@@ -57,6 +57,35 @@ apaga o próprio manifesto.
 Se o manifesto não existir, o `--clear` avisa que não tem nada pra
 remover, em vez de tentar adivinhar.
 
+## Trava de segurança em produção
+
+Se o comando detectar `APP_ENV=production`, ele **não cria nada
+direto** — mostra um aviso e exige digitar a frase exata
+`CRIAR DADOS DE TESTE` pra confirmar. Qualquer coisa diferente disso
+(inclusive apertar Enter vazio) cancela a operação sem criar nada.
+
+```
+⚠ Este ambiente está configurado como PRODUÇÃO (APP_ENV=production).
+Isso vai criar dados FICTÍCIOS (Oportunidades, Projetos, Clientes) misturados com dados reais.
+
+ Pra confirmar, digite exatamente: CRIAR DADOS DE TESTE:
+ >
+```
+
+Pra automação/scripts (sem interação), dá pra pular a pergunta com
+`--force` — mas aí a responsabilidade de não rodar sem querer é de quem
+está chamando o comando:
+
+```bash
+php artisan demo:sales-data --force
+```
+
+**Testado** simulando produção (`--env=production`) nos dois cenários:
+resposta errada → recusado, nada criado; com `--force` → criado sem
+perguntar. O comando `--clear` **não** tem essa trava (só remove o que
+ele mesmo criou, então é seguro rodar em produção sem confirmação
+extra).
+
 ## Onde fica o código
 
 `app/Console/Commands/DemoSalesData.php`
